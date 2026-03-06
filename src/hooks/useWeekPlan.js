@@ -20,7 +20,7 @@ export function useWeekPlan(cycle, weekOffset = 0) {
     const liftsWithTM = lifts.map((l) => ({ ...l, trainingMax: calcTrainingMax(l.oneRepMax) }))
 
     const waveIdx = getWaveWeekIndex(cycle, weekOffset)
-    const waveWeek = template.waveWeeks[waveIdx]
+    const waveWeek = template.waveWeeks[waveIdx] ?? template.waveWeeks[0]
     const weekDays = getWeekDays(cycle, weekOffset)
 
     const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']

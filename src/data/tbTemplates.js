@@ -30,6 +30,23 @@ export const TB_TEMPLATES = [
     defaultDays: [1, 2, 4, 5], // Mon, Tue, Thu, Fri
   },
   {
+    id: 'operator-6wk',
+    name: 'Operator (6-Week)',
+    isCustom: false,
+    sessionsPerWeek: 3,
+    sessionLabels: ['A', 'B', 'C'],
+    waveWeeks: [
+      { week: 1, sets: 5, reps: 5, loadPercent: 70, restMinutes: 2 },
+      { week: 2, sets: 5, reps: 5, loadPercent: 80, restMinutes: 3 },
+      { week: 3, sets: 5, reps: 3, loadPercent: 90, restMinutes: 4 },
+      { week: 4, sets: 5, reps: 5, loadPercent: 75, restMinutes: 2 },
+      { week: 5, sets: 5, reps: 4, loadPercent: 85, restMinutes: 3 },
+      { week: 6, sets: 5, reps: 2, loadPercent: 95, restMinutes: 5 },
+    ],
+    sessionLiftMap: { A: 'all', B: 'all', C: 'all' },
+    defaultDays: [1, 3, 5], // Mon, Wed, Fri
+  },
+  {
     id: 'fighter',
     name: 'Fighter',
     isCustom: false,

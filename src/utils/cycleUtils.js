@@ -92,7 +92,8 @@ export function getWaveWeekIndex(cycle, weekOffset = 0) {
   today.setHours(0, 0, 0, 0)
 
   const weeksSinceStart = Math.floor((today - cycleStart) / (7 * 24 * 60 * 60 * 1000))
-  return (weeksSinceStart + weekOffset + (cycle.currentWeekOffset || 0)) % totalWaveWeeks
+  const raw = (weeksSinceStart + weekOffset + (cycle.currentWeekOffset || 0)) % totalWaveWeeks
+  return ((raw % totalWaveWeeks) + totalWaveWeeks) % totalWaveWeeks
 }
 
 export const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
