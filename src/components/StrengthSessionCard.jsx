@@ -27,7 +27,14 @@ export default function StrengthSessionCard({ sessionLabel, exercises, waveWeek 
           className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0"
         >
           <div>
-            <div className="font-medium text-gray-800 dark:text-white text-sm">{ex.name}</div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-medium text-gray-800 dark:text-white text-sm">{ex.name}</span>
+              {ex.isHinge && (
+                <span className="text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded">
+                  hinge
+                </span>
+              )}
+            </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">
               {ex.sets}×{ex.reps} @ {ex.loadPercent}%
             </div>

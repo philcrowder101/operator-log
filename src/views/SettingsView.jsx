@@ -5,11 +5,13 @@ import { useActiveCycle } from '../hooks/useActiveCycle'
 import { TB_TEMPLATES } from '../data/tbTemplates'
 import WaveEditor from '../components/WaveEditor'
 import LiftClusterEditor from '../components/LiftClusterEditor'
+import HingeLiftEditor from '../components/HingeLiftEditor'
 import ConditioningDayEditor from '../components/ConditioningDayEditor'
 
 export default function SettingsView() {
   const { cycleId } = useActiveCycle()
   const allCycles = useLiveQuery(() => db.cycles.toArray()) || []
+  const allLifts = useLiveQuery(() => db.lifts.toArray()) || []
   const [creating, setCreating] = useState(false)
   const [newCycleName, setNewCycleName] = useState('')
   const [newTemplateId, setNewTemplateId] = useState('operator')
@@ -208,6 +210,18 @@ export default function SettingsView() {
                     <LiftClusterEditor
                       liftIds={cycle.liftIds || []}
                       onChange={(liftIds) => updateCycle(cycle.id, { liftIds })}
+                    />
+                  </SubSection>
+
+                  {/* Hinge Lift */}
+                  <SubSection title="Hinge Lift" expanded={expandedSubSection === 'hinge'} onToggle={() => toggleSub('hinge')}>
+                    <HingeLiftEditor
+                      hingeConfig={cycle.hingeConfig || null}
+                      onHingeChange={(cfg) => updateCycle(cycle.id, { hingeConfig: cfg })}
+                      liftIds={cycle.liftIds || []}
+                      onLiftIdsChange={(liftIds) => updateCycle(cycle.id, { liftIds })}
+                      sessionsPerWeek={template?.sessionsPerWeek || 3}
+                      clusterLifts={allLifts.filter((l) => (cycle.liftIds || []).includes(l.id) && l.id !== cycle.hingeConfig?.liftId)}
                     />
                   </SubSection>
 

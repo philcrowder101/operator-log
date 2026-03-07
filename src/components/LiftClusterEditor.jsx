@@ -2,14 +2,13 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 
+// Deadlift and Single Leg Deadlift are managed as hinge lifts in the Hinge Lift section
 const PRESET_LIFTS = [
   'Bench Press',
   'Squat',
-  'Deadlift',
   'Weighted Pullups',
   'Military Press',
   'Bulgarian Split Squats',
-  'Single Leg Deadlift',
   'Incline Bench',
   'Decline Bench',
   'Rows',
