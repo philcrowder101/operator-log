@@ -16,7 +16,7 @@ const TABS = [
   },
   {
     id: 'lifts',
-    label: 'Lifts',
+    label: 'Actions',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6h2m0 0V4m0 2v2M19 6h2m-2 0V4m0 2v2M7 6h10M7 18h10m-8-6h6M5 18H3m0 0v2m0-2v-2m18 2v2m0-2v-2" />

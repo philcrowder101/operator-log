@@ -15,6 +15,9 @@ export function useWeekPlan(cycle, weekOffset = 0) {
     const template = TB_TEMPLATES.find((t) => t.id === cycle.templateId)
     if (!template) return null
 
+    // Load conditioning routines (reactive to library changes)
+    const allRoutines = await db.conditioningRoutines.toArray()
+
     // Load lifts for this cycle
     const lifts = await db.lifts.where('id').anyOf(cycle.liftIds || []).toArray()
     const liftsWithTM = lifts.map((l) => ({ ...l, trainingMax: calcTrainingMax(l.oneRepMax) }))
@@ -98,10 +101,13 @@ export function useWeekPlan(cycle, weekOffset = 0) {
         }
       }
 
-      // Find conditioning for this day of week
-      const conditioning = (cycle.conditioningDays || []).find(
-        (c) => c.dayOfWeek === day.dayOfWeek
-      ) || null
+      // Find conditioning for this week+day from the schedule
+      const schedEntry = (cycle.conditioningSchedule || []).find(
+        (e) => e.weekNumber === waveWeek.week && e.dayOfWeek === day.dayOfWeek
+      )
+      const conditioning = schedEntry
+        ? (allRoutines.find((r) => r.id === schedEntry.routineId) || null)
+        : null
 
       return {
         date: day.date,
@@ -113,7 +119,7 @@ export function useWeekPlan(cycle, weekOffset = 0) {
         conditioning,
       }
     })
-  }, [cycle?.id, JSON.stringify(cycle?.liftIds), JSON.stringify(cycle?.liftSessionMap), JSON.stringify(cycle?.conditioningDays), JSON.stringify(cycle?.hingeConfig), weekOffset])
+  }, [cycle?.id, JSON.stringify(cycle?.liftIds), JSON.stringify(cycle?.liftSessionMap), JSON.stringify(cycle?.conditioningSchedule), JSON.stringify(cycle?.hingeConfig), weekOffset])
 
   return plan || null
 }

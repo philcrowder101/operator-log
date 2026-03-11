@@ -1,5 +1,5 @@
 export default function ConditioningCard({ conditioning }) {
-  const { sessionType, details } = conditioning
+  const { sessionType, details, name } = conditioning
 
   const typeBadgeClass = {
     SE: 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
@@ -13,7 +13,9 @@ export default function ConditioningCard({ conditioning }) {
         <span className={`text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${typeBadgeClass}`}>
           {sessionType}
         </span>
-        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Conditioning</span>
+        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+          {name || 'Conditioning'}
+        </span>
       </div>
 
       {sessionType === 'SE' && (

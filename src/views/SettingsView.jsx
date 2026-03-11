@@ -6,7 +6,7 @@ import { TB_TEMPLATES } from '../data/tbTemplates'
 import WaveEditor from '../components/WaveEditor'
 import LiftClusterEditor from '../components/LiftClusterEditor'
 import HingeLiftEditor from '../components/HingeLiftEditor'
-import ConditioningDayEditor from '../components/ConditioningDayEditor'
+import ConditioningScheduleEditor from '../components/ConditioningScheduleEditor'
 
 export default function SettingsView() {
   const { cycleId } = useActiveCycle()
@@ -33,7 +33,7 @@ export default function SettingsView() {
       totalWeeks: 12,
       liftIds: [],
       liftSessionMap: {},
-      conditioningDays: [],
+      conditioningSchedule: [],
       status: 'active',
     })
     await setActiveCycle(id)
@@ -225,11 +225,12 @@ export default function SettingsView() {
                     />
                   </SubSection>
 
-                  {/* Conditioning Days */}
-                  <SubSection title="Conditioning Days" expanded={expandedSubSection === 'conditioning'} onToggle={() => toggleSub('conditioning')}>
-                    <ConditioningDayEditor
-                      conditioningDays={cycle.conditioningDays || []}
-                      onChange={(conditioningDays) => updateCycle(cycle.id, { conditioningDays })}
+                  {/* Conditioning Schedule */}
+                  <SubSection title="Conditioning Schedule" expanded={expandedSubSection === 'conditioning'} onToggle={() => toggleSub('conditioning')}>
+                    <ConditioningScheduleEditor
+                      cycle={cycle}
+                      totalWaveWeeks={totalWaveWeeks}
+                      onChange={(conditioningSchedule) => updateCycle(cycle.id, { conditioningSchedule })}
                     />
                   </SubSection>
 

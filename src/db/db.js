@@ -11,6 +11,15 @@ db.version(1).stores({
   appState: 'key',
 })
 
+db.version(2).stores({
+  lifts: '++id, name',
+  liftHistory: '++id, liftId, date',
+  templates: '++id, name',
+  cycles: '++id, status',
+  appState: 'key',
+  conditioningRoutines: '++id, name, sessionType',
+})
+
 /** Seed default TB templates on first run (no starter cycle) */
 export async function seedIfEmpty() {
   const existingTemplates = await db.templates.count()
