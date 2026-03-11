@@ -7,7 +7,7 @@ import ConditioningLibrary from '../components/ConditioningLibrary'
 
 export default function LiftsView() {
   const { cycle } = useActiveCycle()
-  const lifts = useLifts(cycle?.liftIds || null)
+  const lifts = useLifts()
   const [selectedLiftId, setSelectedLiftId] = useState(null)
   const [conditioningExpanded, setConditioningExpanded] = useState(false)
 
