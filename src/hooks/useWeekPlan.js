@@ -45,7 +45,7 @@ export function useWeekPlan(cycle, weekOffset = 0) {
       const isTraining = day.sessionLabel !== null
 
       let exercises = []
-      if (isTraining) {
+      if (isTraining && !waveWeek.strengthOff) {
         // Determine which lifts appear in this session
         let sessionLifts = regularLifts
         const liftSessionMap = cycle.liftSessionMap || {}
