@@ -10,7 +10,20 @@ import { getWeekDays, getWaveWeekIndex } from '../utils/cycleUtils'
  */
 export function useWeekPlan(cycle, weekOffset = 0) {
   const plan = useLiveQuery(async () => {
-    if (!cycle) return null
+    if (!cycle) {
+      const today = new Date()
+      const dow = today.getDay()
+      const mondayOffset = dow === 0 ? -6 : 1 - dow
+      const monday = new Date(today)
+      monday.setDate(today.getDate() + mondayOffset + weekOffset * 7)
+      monday.setHours(0, 0, 0, 0)
+      const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      return Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(monday)
+        date.setDate(monday.getDate() + i)
+        return { date, dayOfWeek: date.getDay(), dayLabel: DAY_LABELS[date.getDay()], sessionLabel: null, waveWeek: null, exercises: [], conditioning: null }
+      })
+    }
 
     const template = TB_TEMPLATES.find((t) => t.id === cycle.templateId)
     if (!template) return null

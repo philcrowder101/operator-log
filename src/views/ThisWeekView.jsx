@@ -44,7 +44,13 @@ export default function ThisWeekView() {
     : null
 
   const selectedCycleId = manualCycleId ?? autoCycle?.id ?? null
-  const cycle = allCycles.find((c) => c.id === selectedCycleId) ?? null
+  const selectedCycle = allCycles.find((c) => c.id === selectedCycleId) ?? null
+
+  // If the selected cycle hasn't started yet and we've navigated to a week before it begins,
+  // fall back to the most recent started cycle (or null) so we show "Rest Week" instead.
+  const weekIsBeforeSelectedCycle =
+    selectedCycle && !cycleHasStarted(selectedCycle) && weekOffset < weeksUntilCycle(selectedCycle)
+  const cycle = weekIsBeforeSelectedCycle ? (autoCycle ?? null) : selectedCycle
 
   const plan = useWeekPlan(cycle, weekOffset)
   const template = cycle ? TB_TEMPLATES.find((t) => t.id === cycle.templateId) : null
@@ -66,32 +72,9 @@ export default function ThisWeekView() {
     )
   }
 
-  // No started cycles — show upcoming list
-  if (!cycle) {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="px-4 pt-4 pb-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-          <h1 className="font-bold text-xl text-gray-800 dark:text-white">This Week</h1>
-        </div>
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-24">
-          {upcomingCycles.length > 0 && (
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">
-                Upcoming
-              </div>
-              <div className="space-y-2">
-                {upcomingCycles
-                  .sort((a, b) => a.startDate.localeCompare(b.startDate))
-                  .map((c) => (
-                    <CycleRow key={c.id} cycle={c} onSelect={() => selectCycle(c.id)} />
-                  ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
+  const soonestUpcoming = upcomingCycles.length > 0
+    ? upcomingCycles.slice().sort((a, b) => a.startDate.localeCompare(b.startDate))[0]
+    : null
 
   return (
     <div className="flex flex-col h-full">
@@ -131,12 +114,12 @@ export default function ThisWeekView() {
           </button>
           <div className="text-center">
             <div className="font-bold text-gray-800 dark:text-white">
-              Wave Week {waveWeekNumber} — {template?.name || cycle.templateId}
+              {cycle ? `Wave Week ${waveWeekNumber} — ${template?.name || cycle.templateId}` : 'Rest Week'}
             </div>
             <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               {dateRangeLabel}
             </div>
-            {!cycleHasStarted(cycle) && (
+            {cycle && !cycleHasStarted(cycle) && (
               <div className="text-xs text-orange-500 dark:text-orange-400 mt-0.5 font-medium">
                 Starts {cycle.startDate}
               </div>
@@ -157,6 +140,20 @@ export default function ThisWeekView() {
               className="text-xs text-blue-500 dark:text-blue-400 font-medium"
             >
               Back to current week
+            </button>
+          </div>
+        )}
+
+        {!cycle && soonestUpcoming && (
+          <div className="mt-3 flex items-center justify-between px-3 py-2 rounded-lg bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800">
+            <span className="text-xs text-orange-700 dark:text-orange-300 font-medium">
+              {soonestUpcoming.name} starts {soonestUpcoming.startDate}
+            </span>
+            <button
+              onClick={() => selectCycle(soonestUpcoming.id)}
+              className="text-xs font-semibold text-orange-600 dark:text-orange-400 ml-3 whitespace-nowrap"
+            >
+              Preview →
             </button>
           </div>
         )}
