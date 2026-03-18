@@ -3,26 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { useWeekPlan } from '../hooks/useWeekPlan'
 import { TB_TEMPLATES } from '../data/tbTemplates'
+import { cycleHasStarted, weeksUntilCycle } from '../utils/cycleUtils'
 import DayCard from '../components/DayCard'
-
-const todayStr = new Date().toISOString().split('T')[0]
-
-function cycleHasStarted(cycle) {
-  return cycle.startDate <= todayStr
-}
-
-/** How many calendar weeks from now until the cycle's start week */
-function weeksUntilCycle(cycle) {
-  const getMonday = (d) => {
-    const dt = new Date(d + 'T00:00:00')
-    const day = dt.getDay()
-    dt.setDate(dt.getDate() - (day === 0 ? 6 : day - 1))
-    return dt
-  }
-  const nowMonday = getMonday(todayStr)
-  const startMonday = getMonday(cycle.startDate)
-  return Math.round((startMonday - nowMonday) / (7 * 24 * 60 * 60 * 1000))
-}
 
 export default function ThisWeekView() {
   const allCycles = useLiveQuery(() => db.cycles.toArray()) || []

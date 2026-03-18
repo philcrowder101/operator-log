@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { useActiveCycle } from '../hooks/useActiveCycle'
 import { TB_TEMPLATES } from '../data/tbTemplates'
+import { getWaveWeekIndex } from '../utils/cycleUtils'
 import WaveEditor from '../components/WaveEditor'
 import LiftClusterEditor from '../components/LiftClusterEditor'
 import HingeLiftEditor from '../components/HingeLiftEditor'
@@ -89,12 +90,7 @@ export default function SettingsView() {
           const isActive = cycle.id === cycleId
           const isExpanded = expandedCycleId === cycle.id
           const totalWaveWeeks = template?.waveWeeks.length || 3
-          const weeksSinceStart = Math.floor(
-            (Date.now() - new Date(cycle.startDate).setHours(0, 0, 0, 0)) / (7 * 24 * 60 * 60 * 1000)
-          )
-          const currentWaveWeek =
-            ((weeksSinceStart + (cycle.currentWeekOffset || 0)) % totalWaveWeeks + totalWaveWeeks) %
-              totalWaveWeeks + 1
+          const currentWaveWeek = getWaveWeekIndex(cycle, 0) + 1
 
           return (
             <div

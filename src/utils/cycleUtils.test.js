@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { getWaveWeekIndex, getWeekDays } from './cycleUtils'
+import { getWaveWeekIndex, getWeekDays, cycleHasStarted, weeksUntilCycle } from './cycleUtils'
 
 // Pin "today" to a known Monday using local time.
 // April 13, 2026 is a Monday and is well clear of the March 8 US DST boundary,
@@ -39,6 +39,43 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers()
+})
+
+// ─── cycleHasStarted ────────────────────────────────────────────────────────
+
+describe('cycleHasStarted', () => {
+  it('returns true when startDate equals today (UTC)', () => {
+    // FAKE_TODAY local midnight → UTC ISO starts with '2026-04-13'
+    expect(cycleHasStarted({ startDate: '2026-04-13' })).toBe(true)
+  })
+
+  it('returns true when startDate is in the past', () => {
+    expect(cycleHasStarted({ startDate: '2026-04-12' })).toBe(true)
+    expect(cycleHasStarted({ startDate: '2025-01-01' })).toBe(true)
+  })
+
+  it('returns false when startDate is in the future', () => {
+    expect(cycleHasStarted({ startDate: '2026-04-14' })).toBe(false)
+    expect(cycleHasStarted({ startDate: '2027-01-01' })).toBe(false)
+  })
+})
+
+// ─── weeksUntilCycle ────────────────────────────────────────────────────────
+
+describe('weeksUntilCycle', () => {
+  it('returns 0 when cycle starts this week (same Monday)', () => {
+    expect(weeksUntilCycle({ startDate: '2026-04-13' })).toBe(0) // the Monday itself
+    expect(weeksUntilCycle({ startDate: '2026-04-15' })).toBe(0) // mid-week
+  })
+
+  it('returns 1 for a cycle starting next Monday', () => {
+    expect(weeksUntilCycle({ startDate: '2026-04-20' })).toBe(1)
+  })
+
+  it('returns negative for a cycle that already started', () => {
+    expect(weeksUntilCycle({ startDate: '2026-04-06' })).toBe(-1) // last week
+    expect(weeksUntilCycle({ startDate: '2026-03-30' })).toBe(-2)
+  })
 })
 
 // ─── getWaveWeekIndex ───────────────────────────────────────────────────────

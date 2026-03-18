@@ -97,5 +97,28 @@ export function getWaveWeekIndex(cycle, weekOffset = 0) {
   return ((raw % totalWaveWeeks) + totalWaveWeeks) % totalWaveWeeks
 }
 
+/** Returns true if the cycle's start date is today or in the past (UTC date comparison). */
+export function cycleHasStarted(cycle) {
+  const todayStr = new Date().toISOString().split('T')[0]
+  return cycle.startDate <= todayStr
+}
+
+/**
+ * Returns how many calendar weeks from this week until the cycle's start week.
+ * Negative when the cycle started in the past, 0 when it starts this week.
+ */
+export function weeksUntilCycle(cycle) {
+  const getMonday = (dateStr) => {
+    const dt = new Date(dateStr + 'T00:00:00') // local-time parse
+    const day = dt.getDay()
+    dt.setDate(dt.getDate() - (day === 0 ? 6 : day - 1))
+    return dt
+  }
+  const todayStr = new Date().toISOString().split('T')[0]
+  const nowMonday = getMonday(todayStr)
+  const startMonday = getMonday(cycle.startDate)
+  return Math.round((startMonday - nowMonday) / (7 * 24 * 60 * 60 * 1000))
+}
+
 export const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export const DAY_NAMES_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
