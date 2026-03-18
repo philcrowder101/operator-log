@@ -5,13 +5,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev      # Start Vite dev server with HMR
-npm run build    # Build for production
-npm run lint     # Run ESLint
-npm run preview  # Preview production build
+npm run dev        # Start Vite dev server with HMR
+npm run build      # Build for production
+npm run lint       # Run ESLint
+npm run preview    # Preview production build
+npm test           # Run all tests (Vitest)
+npm run test:watch # Run tests in watch mode
 ```
-
-No test runner is configured.
 
 ## Architecture
 
@@ -37,15 +37,22 @@ No React Router. Three-tab layout managed with local state (`activeTab`): **This
 
 ### Core Data Flow
 1. `appState.activeCycleId` → `useActiveCycle()` hook → current cycle object
-2. `useWeekPlan(cycle, weekOffset)` — the main planning hook; combines cycle config + waveWeeks to produce a day-by-day training plan for the given week offset from cycle start
-3. `loadCalculator.js` — computes working weights from 1RM percentages and training max
-4. `cycleUtils.js` — week/wave index calculations relative to cycle start date
+2. `useWeekPlan(cycle, weekOffset)` — fetches lifts and conditioning routines from Dexie, then delegates all scheduling to `buildWeekPlan()`
+3. `buildWeekPlan(cycle, lifts, routines, weekOffset)` in `src/utils/weekPlanBuilder.js` — pure function; produces the 7-day plan array. This is where hinge lift logic, session mapping, and conditioning assignment live.
+4. `loadCalculator.js` — computes working weights from 1RM percentages and training max
+5. `cycleUtils.js` — date/week utilities: `getWaveWeekIndex`, `getWeekDays`, `cycleHasStarted`, `weeksUntilCycle`
 
 ### Training Structure
 - **Templates** (`src/data/tbTemplates.js`): pre-built Tactical Barbell programs (Operator, Zulu, Fighter, Base Build, etc.) define session counts and default wave structure
 - **Cycles**: user picks a template, assigns lifts, configures `waveWeeks[]` (sets/reps/load%/rest per week), and sets a start date
 - **Hinge lift**: one lift is designated as the hinge movement and follows separate scheduling logic
 - **Conditioning**: scheduled per-week via `ConditioningScheduleEditor`; routines come from the conditioning library
+
+### Testing
+- **Vitest** is configured via the `test` block in `vite.config.js` (`environment: 'node'`, `globals: true`)
+- Tests live alongside source files as `*.test.js`
+- Pure utility functions are the primary test target — DB-coupled hooks are not tested
+- Date-sensitive tests use `vi.useFakeTimers()` + `vi.setSystemTime()`. Always pin to a date well clear of US DST boundaries (e.g., mid-April). Use `new Date(year, month-1, day)` for the fake date and local noon datetime strings (no trailing `Z`) for cycle `startDate` values to avoid UTC-vs-local day-shift issues.
 
 ### Styling Notes
 - Tailwind dark mode via `prefers-color-scheme` media query
