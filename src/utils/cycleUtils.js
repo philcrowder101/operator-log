@@ -44,7 +44,7 @@ export function getWeekDays(cycle, weekOffset = 0) {
   // Count total training sessions before this week's Monday
   let totalSessionsBefore = 0
   const refMonday = new Date(monday)
-  const dayDiff = Math.floor((refMonday - cycleStart) / (1000 * 60 * 60 * 24))
+  const dayDiff = Math.round((refMonday - cycleStart) / (1000 * 60 * 60 * 24))
   if (dayDiff > 0) {
     // Weeks before this week
     const fullWeeksBefore = Math.floor(dayDiff / 7)
@@ -91,7 +91,8 @@ export function getWaveWeekIndex(cycle, weekOffset = 0) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const weeksSinceStart = Math.floor((today - cycleStart) / (7 * 24 * 60 * 60 * 1000))
+  const daysSinceStart = Math.round((today - cycleStart) / (24 * 60 * 60 * 1000))
+  const weeksSinceStart = Math.floor(daysSinceStart / 7)
   const raw = (weeksSinceStart + weekOffset + (cycle.currentWeekOffset || 0)) % totalWaveWeeks
   return ((raw % totalWaveWeeks) + totalWaveWeeks) % totalWaveWeeks
 }
