@@ -1,14 +1,8 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
-
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-const TYPE_COLORS = {
-  SE: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-  HIC: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
-  Endurance: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
-}
+import { DAY_NAMES } from '../utils/cycleUtils'
+import { TYPE_COLORS } from '../utils/conditioningConstants'
 
 export default function ConditioningScheduleEditor({ cycle, totalWaveWeeks, onChange }) {
   const schedule = cycle.conditioningSchedule || []

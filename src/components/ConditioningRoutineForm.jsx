@@ -1,8 +1,5 @@
 import { useState } from 'react'
-
-const DEFAULT_SE = { exercises: [{ name: '', circuits: 3, reps: 10 }], restBetweenCircuits: '2 min' }
-const DEFAULT_ENDURANCE = { activity: 'Run', duration: '30 min', distance: '' }
-const DEFAULT_HIC = { exercise: '', workInterval: '20s', restInterval: '40s', rounds: 8 }
+import { DEFAULT_SE, DEFAULT_ENDURANCE, DEFAULT_HIC } from '../utils/conditioningConstants'
 
 export default function ConditioningRoutineForm({ routine, onSave, onCancel }) {
   const [name, setName] = useState(routine?.name || '')

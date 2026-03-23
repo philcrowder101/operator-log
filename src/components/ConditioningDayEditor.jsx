@@ -1,13 +1,6 @@
 import { useState } from 'react'
-
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-const DEFAULT_SE = {
-  exercises: [{ name: '', circuits: 3, reps: 10 }],
-  restBetweenCircuits: '2 min',
-}
-const DEFAULT_ENDURANCE = { activity: 'Run', duration: '30 min', distance: '' }
-const DEFAULT_HIC = { exercise: '', workInterval: '20s', restInterval: '40s', rounds: 8 }
+import { DAY_NAMES } from '../utils/cycleUtils'
+import { DEFAULT_SE, DEFAULT_ENDURANCE, DEFAULT_HIC } from '../utils/conditioningConstants'
 
 export default function ConditioningDayEditor({ conditioningDays, onChange }) {
   const [editingDay, setEditingDay] = useState(null) // dayOfWeek number or null

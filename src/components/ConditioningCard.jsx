@@ -1,11 +1,9 @@
+import { TYPE_COLORS } from '../utils/conditioningConstants'
+
 export default function ConditioningCard({ conditioning }) {
   const { sessionType, details, name } = conditioning
 
-  const typeBadgeClass = {
-    SE: 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
-    Endurance: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
-    HIC: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
-  }[sessionType] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+  const typeBadgeClass = TYPE_COLORS[sessionType] || 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
 
   return (
     <div className="space-y-2">
