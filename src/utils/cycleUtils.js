@@ -1,5 +1,11 @@
 import { TB_TEMPLATES } from '../data/tbTemplates'
 
+// Returns today's date as a local YYYY-MM-DD string (not UTC).
+function todayLocalStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 /**
  * Given a cycle's start date and template, return an array of 7 day objects
  * for the week containing `targetDate`.
@@ -38,8 +44,8 @@ export function getWeekDays(cycle, weekOffset = 0) {
 
   // For Zulu (4x/week A/B alternating), we need to count across weeks
   // Use cycle start date to keep session sequencing consistent
-  const cycleStart = new Date(cycle.startDate)
-  cycleStart.setHours(0, 0, 0, 0)
+  // Parse as local midnight, not UTC (date-only ISO strings default to UTC).
+  const cycleStart = new Date(cycle.startDate + 'T00:00:00')
 
   // Count total training sessions before this week's Monday
   let totalSessionsBefore = 0
@@ -86,8 +92,8 @@ export function getWaveWeekIndex(cycle, weekOffset = 0) {
   if (!template) return 0
   const totalWaveWeeks = template.waveWeeks.length
 
-  const cycleStart = new Date(cycle.startDate)
-  cycleStart.setHours(0, 0, 0, 0)
+  // Parse as local midnight, not UTC (date-only ISO strings default to UTC).
+  const cycleStart = new Date(cycle.startDate + 'T00:00:00')
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
@@ -97,10 +103,9 @@ export function getWaveWeekIndex(cycle, weekOffset = 0) {
   return ((raw % totalWaveWeeks) + totalWaveWeeks) % totalWaveWeeks
 }
 
-/** Returns true if the cycle's start date is today or in the past (UTC date comparison). */
+/** Returns true if the cycle's start date is today or in the past. */
 export function cycleHasStarted(cycle) {
-  const todayStr = new Date().toISOString().split('T')[0]
-  return cycle.startDate <= todayStr
+  return cycle.startDate <= todayLocalStr()
 }
 
 /**
@@ -114,8 +119,7 @@ export function weeksUntilCycle(cycle) {
     dt.setDate(dt.getDate() - (day === 0 ? 6 : day - 1))
     return dt
   }
-  const todayStr = new Date().toISOString().split('T')[0]
-  const nowMonday = getMonday(todayStr)
+  const nowMonday = getMonday(todayLocalStr())
   const startMonday = getMonday(cycle.startDate)
   return Math.round((startMonday - nowMonday) / (7 * 24 * 60 * 60 * 1000))
 }

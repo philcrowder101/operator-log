@@ -20,6 +20,8 @@ export function useWeekPlan(cycle, weekOffset = 0) {
     return buildWeekPlan(cycle, liftsWithTM, allRoutines, weekOffset)
   }, [
     cycle?.id,
+    cycle?.startDate,
+    cycle?.currentWeekOffset,
     JSON.stringify(cycle?.liftIds),
     JSON.stringify(cycle?.liftSessionMap),
     JSON.stringify(cycle?.conditioningSchedule),

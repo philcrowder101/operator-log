@@ -52,7 +52,7 @@ No React Router. Three-tab layout managed with local state (`activeTab`): **This
 - **Vitest** is configured via the `test` block in `vite.config.js` (`environment: 'node'`, `globals: true`)
 - Tests live alongside source files as `*.test.js`
 - Pure utility functions are the primary test target — DB-coupled hooks are not tested
-- Date-sensitive tests use `vi.useFakeTimers()` + `vi.setSystemTime()`. Always pin to a date well clear of US DST boundaries (e.g., mid-April). Use `new Date(year, month-1, day)` for the fake date and local noon datetime strings (no trailing `Z`) for cycle `startDate` values to avoid UTC-vs-local day-shift issues.
+- Date-sensitive tests use `vi.useFakeTimers()` + `vi.setSystemTime()`. Always pin to a date well clear of US DST boundaries (e.g., mid-April). Use `new Date(year, month-1, day)` for the fake date. Cycle `startDate` values must be plain `YYYY-MM-DD` strings (same format as the production code); `cycleUtils.js` parses them as local midnight via `+ 'T00:00:00'`.
 
 ### Styling Notes
 - Tailwind dark mode via `prefers-color-scheme` media query

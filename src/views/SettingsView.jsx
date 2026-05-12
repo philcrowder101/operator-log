@@ -16,7 +16,10 @@ export default function SettingsView() {
   const [creating, setCreating] = useState(false)
   const [newCycleName, setNewCycleName] = useState('')
   const [newTemplateId, setNewTemplateId] = useState('operator')
-  const [newStartDate, setNewStartDate] = useState(() => new Date().toISOString().split('T')[0])
+  const [newStartDate, setNewStartDate] = useState(() => {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })
   const [expandedCycleId, setExpandedCycleId] = useState(null)
   const [expandedSubSection, setExpandedSubSection] = useState(null)
 
@@ -40,7 +43,8 @@ export default function SettingsView() {
     await setActiveCycle(id)
     setCreating(false)
     setNewCycleName('')
-    setNewStartDate(new Date().toISOString().split('T')[0])
+    const d = new Date()
+    setNewStartDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
     setExpandedCycleId(id)
     setExpandedSubSection('lifts')
   }

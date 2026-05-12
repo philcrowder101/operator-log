@@ -4,17 +4,10 @@ import { buildWeekPlan } from './weekPlanBuilder'
 // Pin to April 13, 2026 (Monday), well clear of DST boundaries.
 const FAKE_TODAY = new Date(2026, 3, 13)
 
-function localStartDate(date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}T12:00:00` // local noon, no Z → parsed as local time
-}
-
 function weeksAgo(n) {
   const d = new Date(FAKE_TODAY)
   d.setDate(d.getDate() - n * 7)
-  return localStartDate(d)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 // ─── Shared fixtures ────────────────────────────────────────────────────────

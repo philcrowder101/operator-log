@@ -6,22 +6,11 @@ import { getWaveWeekIndex, getWeekDays, cycleHasStarted, weeksUntilCycle } from 
 // so millisecond-based week arithmetic is stable.
 const FAKE_TODAY = new Date(2026, 3, 13) // April 13, 2026, local midnight
 
-// Build a cycle start date string that parses as LOCAL time.
-// Date-only ISO strings (e.g. '2026-04-06') are parsed as UTC midnight, which
-// shifts to the previous day in US timezones. Using a local noon datetime
-// string avoids that shift across any realistic timezone.
-function localStartDate(date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}T12:00:00` // no trailing Z → parsed as local time
-}
-
-// Return a startDate string that is exactly n * 7 days before FAKE_TODAY.
+// Return a YYYY-MM-DD startDate string that is exactly n * 7 days before FAKE_TODAY.
 function weeksAgo(n) {
   const d = new Date(FAKE_TODAY)
   d.setDate(d.getDate() - n * 7)
-  return localStartDate(d)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 function operatorCycle(startDate, overrides = {}) {
@@ -44,8 +33,7 @@ afterEach(() => {
 // ─── cycleHasStarted ────────────────────────────────────────────────────────
 
 describe('cycleHasStarted', () => {
-  it('returns true when startDate equals today (UTC)', () => {
-    // FAKE_TODAY local midnight → UTC ISO starts with '2026-04-13'
+  it('returns true when startDate equals today', () => {
     expect(cycleHasStarted({ startDate: '2026-04-13' })).toBe(true)
   })
 
@@ -124,8 +112,7 @@ describe('getWaveWeekIndex', () => {
     // boundary, making that "week" only ~167 hours in ms. Math.round corrects
     // this; Math.floor would return 0 instead of 1.
     vi.setSystemTime(new Date(2026, 2, 9))  // March 9 local midnight (post-DST)
-    const startDate = localStartDate(new Date(2026, 2, 2)) // March 2 local noon
-    const cycle = operatorCycle(startDate)
+    const cycle = operatorCycle('2026-03-02') // Started March 2
     expect(getWaveWeekIndex(cycle, 0)).toBe(1)
   })
 })
