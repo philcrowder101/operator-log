@@ -61,20 +61,20 @@ export default function App() {
       </div>
 
       {/* Bottom tab bar */}
-      <div className="flex-shrink-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex-shrink-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 pb-safe">
         <div className="flex">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center pt-2 pb-safe-or-3 gap-0.5 transition-colors ${
+              className={`flex-1 flex flex-col items-center py-2 gap-0.5 transition-colors ${
                 activeTab === tab.id
                   ? 'text-blue-500 dark:text-blue-400'
                   : 'text-gray-400 dark:text-gray-500'
               }`}
             >
               {tab.icon}
-              <span className="text-xs font-medium pb-1">{tab.label}</span>
+              <span className="text-xs font-medium">{tab.label}</span>
             </button>
           ))}
         </div>
