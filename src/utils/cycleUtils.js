@@ -124,5 +124,63 @@ export function weeksUntilCycle(cycle) {
   return Math.round((startMonday - nowMonday) / (7 * 24 * 60 * 60 * 1000))
 }
 
+/**
+ * Returns the cycle that is active for the week at the given weekOffset, or null
+ * if that week is a rest/gap week.
+ *
+ * A cycle with a successor ends after the last full wave that fits before the next
+ * cycle starts. Weeks in the resulting gap are rest weeks.
+ * A cycle with no successor repeats its wave indefinitely.
+ */
+export function getCycleForWeek(allCycles, weekOffset = 0) {
+  if (!allCycles || allCycles.length === 0) return null
+
+  const today = new Date()
+  const dayOfWeek = today.getDay()
+  const mondayDelta = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+  const weekMonday = new Date(today)
+  weekMonday.setDate(today.getDate() + mondayDelta + weekOffset * 7)
+  weekMonday.setHours(0, 0, 0, 0)
+
+  // A cycle is considered "started" for a given week if its start date falls
+  // anywhere within that week (Mon–Sun) or earlier.
+  const weekSunday = new Date(weekMonday)
+  weekSunday.setDate(weekMonday.getDate() + 6)
+  const pad = (n) => String(n).padStart(2, '0')
+  const toStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+  const weekSundayStr = toStr(weekSunday)
+
+  // Most recently started cycle as of this week's Sunday
+  const candidate = allCycles
+    .filter((c) => c.startDate <= weekSundayStr)
+    .sort((a, b) => b.startDate.localeCompare(a.startDate))[0] ?? null
+
+  if (!candidate) return null
+
+  // Find the next cycle by start date (started or upcoming)
+  const allSorted = [...allCycles].sort((a, b) => a.startDate.localeCompare(b.startDate))
+  const idx = allSorted.findIndex((c) => c.id === candidate.id)
+  const nextCycle = idx < allSorted.length - 1 ? allSorted[idx + 1] : null
+
+  if (!nextCycle) return candidate // No successor — repeats indefinitely
+
+  // Compute how many full waves fit between this cycle's start and the next cycle's start
+  const template = TB_TEMPLATES.find((t) => t.id === candidate.templateId)
+  if (!template) return candidate
+  const waveDays = template.waveWeeks.length * 7
+  const cycleStart = new Date(candidate.startDate + 'T00:00:00')
+  const nextStart = new Date(nextCycle.startDate + 'T00:00:00')
+  const daysBetween = Math.round((nextStart - cycleStart) / 86400000)
+  const completedWaves = Math.floor(daysBetween / waveDays)
+
+  if (completedWaves === 0) return candidate // Next cycle starts mid-wave, no gap
+
+  // Effective end = start of the first rest week (one day after last training day)
+  const effectiveEnd = new Date(cycleStart)
+  effectiveEnd.setDate(cycleStart.getDate() + completedWaves * waveDays)
+
+  return weekMonday >= effectiveEnd ? null : candidate
+}
+
 export const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 export const DAY_NAMES_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']

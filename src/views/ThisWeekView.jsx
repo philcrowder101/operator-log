@@ -3,36 +3,24 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { useWeekPlan } from '../hooks/useWeekPlan'
 import { TB_TEMPLATES } from '../data/tbTemplates'
-import { cycleHasStarted, weeksUntilCycle } from '../utils/cycleUtils'
+import { cycleHasStarted, getCycleForWeek, weeksUntilCycle } from '../utils/cycleUtils'
 import DayCard from '../components/DayCard'
 
 export default function ThisWeekView() {
   const allCycles = useLiveQuery(() => db.cycles.toArray()) || []
   const [weekOffset, setWeekOffset] = useState(0)
-  const [manualCycleId, setManualCycleId] = useState(null)
 
-  function selectCycle(id) {
+  // Pure date-based: which cycle (if any) is active for the displayed week?
+  // No "set active" concept — gaps between cycles are rest weeks automatically.
+  const cycle = getCycleForWeek(allCycles, weekOffset)
+
+  function jumpToCycle(id) {
     const c = allCycles.find((x) => x.id === id)
-    setManualCycleId(id)
-    setWeekOffset(c && !cycleHasStarted(c) ? weeksUntilCycle(c) : 0)
+    if (c) setWeekOffset(weeksUntilCycle(c))
   }
 
-  // Auto-pick the most recently started cycle for this week
   const startedCycles = allCycles.filter(cycleHasStarted)
   const upcomingCycles = allCycles.filter((c) => !cycleHasStarted(c))
-
-  const autoCycle = startedCycles.length > 0
-    ? startedCycles.reduce((a, b) => (a.startDate >= b.startDate ? a : b))
-    : null
-
-  const selectedCycleId = manualCycleId ?? autoCycle?.id ?? null
-  const selectedCycle = allCycles.find((c) => c.id === selectedCycleId) ?? null
-
-  // If the selected cycle hasn't started yet and we've navigated to a week before it begins,
-  // fall back to the most recent started cycle (or null) so we show "Rest Week" instead.
-  const weekIsBeforeSelectedCycle =
-    selectedCycle && !cycleHasStarted(selectedCycle) && weekOffset < weeksUntilCycle(selectedCycle)
-  const cycle = weekIsBeforeSelectedCycle ? (autoCycle ?? null) : selectedCycle
 
   const plan = useWeekPlan(cycle, weekOffset)
   const template = cycle ? TB_TEMPLATES.find((t) => t.id === cycle.templateId) : null
@@ -54,6 +42,7 @@ export default function ThisWeekView() {
     )
   }
 
+  // Next upcoming cycle (for the "starts soon" banner)
   const soonestUpcoming = upcomingCycles.length > 0
     ? upcomingCycles.slice().sort((a, b) => a.startDate.localeCompare(b.startDate))[0]
     : null
@@ -63,14 +52,15 @@ export default function ThisWeekView() {
       {/* Header */}
       <div className="px-4 pt-4 pb-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
 
-        {/* Cycle selector — shown when multiple cycles exist */}
+        {/* Cycle jump selector — navigate to any cycle's start week */}
         {allCycles.length > 1 && (
           <div className="mb-3">
             <select
-              value={selectedCycleId ?? ''}
-              onChange={(e) => selectCycle(Number(e.target.value))}
+              value={cycle?.id ?? ''}
+              onChange={(e) => e.target.value && jumpToCycle(Number(e.target.value))}
               className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200"
             >
+              {!cycle && <option value="">— Rest Week —</option>}
               {startedCycles.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -101,11 +91,6 @@ export default function ThisWeekView() {
             <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               {dateRangeLabel}
             </div>
-            {cycle && !cycleHasStarted(cycle) && (
-              <div className="text-xs text-orange-500 dark:text-orange-400 mt-0.5 font-medium">
-                Starts {cycle.startDate}
-              </div>
-            )}
           </div>
           <button
             onClick={() => setWeekOffset((w) => w + 1)}
@@ -132,7 +117,7 @@ export default function ThisWeekView() {
               {soonestUpcoming.name} starts {soonestUpcoming.startDate}
             </span>
             <button
-              onClick={() => selectCycle(soonestUpcoming.id)}
+              onClick={() => jumpToCycle(soonestUpcoming.id)}
               className="text-xs font-semibold text-orange-600 dark:text-orange-400 ml-3 whitespace-nowrap"
             >
               Preview →
@@ -150,20 +135,5 @@ export default function ThisWeekView() {
         )}
       </div>
     </div>
-  )
-}
-
-function CycleRow({ cycle, onSelect }) {
-  const template = TB_TEMPLATES.find((t) => t.id === cycle.templateId)
-  return (
-    <button
-      onClick={onSelect}
-      className="w-full text-left px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
-    >
-      <div className="font-medium text-sm text-gray-800 dark:text-white">{cycle.name}</div>
-      <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-        {template?.name || cycle.templateId} · Starts {cycle.startDate}
-      </div>
-    </button>
   )
 }
