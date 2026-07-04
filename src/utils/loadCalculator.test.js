@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calcTrainingMax, calcWeight } from './loadCalculator'
+import { calcTrainingMax, calcWeight, calcBodyweightReps, calcAddedWeight } from './loadCalculator'
 
 describe('calcTrainingMax', () => {
   it('returns 90% of 1RM rounded to nearest 5', () => {
@@ -34,5 +34,39 @@ describe('calcWeight', () => {
 
   it('handles 100% load', () => {
     expect(calcWeight(200, 100)).toBe(200)
+  })
+})
+
+describe('calcBodyweightReps', () => {
+  it('returns loadPercent of 90% of maxReps, rounded', () => {
+    expect(calcBodyweightReps(15, 70)).toBe(9)   // 15*0.9*0.70 = 9.45 → 9
+    expect(calcBodyweightReps(15, 75)).toBe(10)  // 10.125 → 10
+    expect(calcBodyweightReps(20, 80)).toBe(14)  // 14.4 → 14
+  })
+
+  it('rounds half up', () => {
+    expect(calcBodyweightReps(15, 100)).toBe(14) // 13.5 → 14
+  })
+
+  it('clamps to a minimum of 1 rep', () => {
+    expect(calcBodyweightReps(1, 50)).toBe(1)    // 0.45 → 0 → clamped to 1
+  })
+})
+
+describe('calcAddedWeight', () => {
+  it('returns plate-friendly added weight above bodyweight', () => {
+    // TM 216 @ 95% = 205.2 → 205.2-180 = 25.2 → round(5.04)*5 = 25
+    expect(calcAddedWeight(216, 95, 180)).toBe(25)
+    // TM 216 @ 85% = 183.6 → 3.6 → round(0.72)*5 = 5
+    expect(calcAddedWeight(216, 85, 180)).toBe(5)
+  })
+
+  it('returns negative values when target is below bodyweight', () => {
+    // TM 216 @ 70% = 151.2 → -28.8 → round(-5.76)*5 = -30
+    expect(calcAddedWeight(216, 70, 180)).toBe(-30)
+  })
+
+  it('returns 0 when target equals bodyweight', () => {
+    expect(calcAddedWeight(200, 90, 180)).toBe(0) // 180 - 180 = 0
   })
 })

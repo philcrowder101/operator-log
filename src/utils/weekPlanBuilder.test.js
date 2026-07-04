@@ -330,3 +330,74 @@ describe('buildWeekPlan — core work', () => {
     expect(tuesday.exercises).toHaveLength(0)
   })
 })
+
+// ─── bodyweight lifts ────────────────────────────────────────────────────────
+
+describe('buildWeekPlan — bodyweight lifts', () => {
+  // Operator wave week 1: 5 sets × 5 reps @ 75%
+  const pullups = { id: 3, name: 'Weighted Pullups', trainingMax: 216, isBodyweight: true, maxReps: 15 }
+  const BW = 180
+
+  it('switches to reps mode when target is at or below bodyweight', () => {
+    // 216 * 0.75 = 162 < 180 → reps mode; round(15 * 0.9 * 0.75) = 10
+    const cycle = baseCycle({ liftIds: [3] })
+    const plan = buildWeekPlan(cycle, [pullups], [], 0, BW)
+    const ex = plan.find((d) => d.dayOfWeek === 1).exercises[0]
+    expect(ex.mode).toBe('reps')
+    expect(ex.reps).toBe(10)
+    expect(ex.sets).toBe(5)
+    expect(ex.weightLbs).toBeUndefined()
+    expect(ex.addedLbs).toBeUndefined()
+  })
+
+  it('uses weighted-bw mode with added/total weight when target exceeds bodyweight', () => {
+    // TM 300 @ 75% = 225 → added = round((225-180)/5)*5 = 45, total = 225
+    const strongPullups = { ...pullups, trainingMax: 300 }
+    const cycle = baseCycle({ liftIds: [3] })
+    const plan = buildWeekPlan(cycle, [strongPullups], [], 0, BW)
+    const ex = plan.find((d) => d.dayOfWeek === 1).exercises[0]
+    expect(ex.mode).toBe('weighted-bw')
+    expect(ex.addedLbs).toBe(45)
+    expect(ex.totalLbs).toBe(225)
+    expect(ex.weightLbs).toBeUndefined()
+  })
+
+  it('falls back to normal weighted display when bodyWeight is not set', () => {
+    const cycle = baseCycle({ liftIds: [3] })
+    const plan = buildWeekPlan(cycle, [pullups], [], 0) // no bodyWeight arg
+    const ex = plan.find((d) => d.dayOfWeek === 1).exercises[0]
+    expect(ex.mode).toBeUndefined()
+    expect(ex.weightLbs).toBe(160) // calcWeight(216, 75)
+  })
+
+  it('falls back to normal weighted display when maxReps is missing', () => {
+    const noReps = { id: 3, name: 'Weighted Pullups', trainingMax: 216, isBodyweight: true }
+    const cycle = baseCycle({ liftIds: [3] })
+    const plan = buildWeekPlan(cycle, [noReps], [], 0, BW)
+    const ex = plan.find((d) => d.dayOfWeek === 1).exercises[0]
+    expect(ex.mode).toBeUndefined()
+    expect(ex.weightLbs).toBe(160)
+  })
+
+  it('leaves non-bodyweight lifts untouched when bodyWeight is provided', () => {
+    const cycle = baseCycle() // liftIds [1, 2] → squat, press
+    const plan = buildWeekPlan(cycle, [squat, press], [], 0, BW)
+    const monday = plan.find((d) => d.dayOfWeek === 1)
+    expect(monday.exercises[0].mode).toBeUndefined()
+    expect(monday.exercises[0].weightLbs).toBe(135) // calcWeight(180, 75)
+  })
+
+  it('applies bodyweight logic to the hinge lift too', () => {
+    // Hinge in each-day mode: 1 set, same wave percentages
+    const cycle = baseCycle({
+      liftIds: [1, 3],
+      hingeConfig: { liftId: 3, mode: 'each-day', replacedLiftId: null },
+    })
+    const plan = buildWeekPlan(cycle, [squat, pullups], [], 0, BW)
+    const monday = plan.find((d) => d.dayOfWeek === 1)
+    const hinge = monday.exercises.find((e) => e.isHinge)
+    expect(hinge.mode).toBe('reps')
+    expect(hinge.reps).toBe(10)
+    expect(hinge.sets).toBe(1)
+  })
+})

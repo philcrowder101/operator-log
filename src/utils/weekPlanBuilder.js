@@ -1,6 +1,27 @@
 import { TB_TEMPLATES } from '../data/tbTemplates'
-import { calcWeight } from './loadCalculator'
+import { calcWeight, calcAddedWeight, calcBodyweightReps } from './loadCalculator'
 import { getWeekDays, getWaveWeekIndex, DAY_NAMES } from './cycleUtils'
+
+function buildExercise(lift, waveWeek, bodyWeight) {
+  const base = {
+    id: lift.id,
+    name: lift.name,
+    sets: waveWeek.sets,
+    reps: waveWeek.reps,
+    loadPercent: waveWeek.loadPercent,
+    restMinutes: waveWeek.restMinutes,
+  }
+  if (lift.isBodyweight && bodyWeight > 0) {
+    const added = calcAddedWeight(lift.trainingMax, waveWeek.loadPercent, bodyWeight)
+    if (added > 0) {
+      return { ...base, mode: 'weighted-bw', addedLbs: added, totalLbs: bodyWeight + added }
+    }
+    if (lift.maxReps > 0) {
+      return { ...base, mode: 'reps', reps: calcBodyweightReps(lift.maxReps, waveWeek.loadPercent) }
+    }
+  }
+  return { ...base, weightLbs: calcWeight(lift.trainingMax, waveWeek.loadPercent) }
+}
 
 /**
  * Pure function — builds the 7-day training plan for a given week.
@@ -9,9 +30,10 @@ import { getWeekDays, getWaveWeekIndex, DAY_NAMES } from './cycleUtils'
  * @param {object[]}    lifts  - Lifts for the cycle, each already augmented with trainingMax.
  * @param {object[]}    conditioningRoutines - All conditioning routines from the library.
  * @param {number}      weekOffset - 0 = current week, ±n = n weeks forward/back.
+ * @param {number|null} bodyWeight - User's body weight in lbs, for bodyweight lifts.
  * @returns {object[]|null} Array of 7 day objects, or null if the template is unknown.
  */
-export function buildWeekPlan(cycle, lifts, conditioningRoutines, weekOffset = 0) {
+export function buildWeekPlan(cycle, lifts, conditioningRoutines, weekOffset = 0, bodyWeight = null) {
   if (!cycle) {
     // No active cycle — return an empty week so the UI can still show dates.
     const today = new Date()
@@ -76,27 +98,14 @@ export function buildWeekPlan(cycle, lifts, conditioningRoutines, weekOffset = 0
 
       exercises = sessionLifts
         .filter((lift) => lift.id !== excludeOnThisDay)
-        .map((lift) => ({
-          id: lift.id,
-          name: lift.name,
-          sets: waveWeek.sets,
-          reps: waveWeek.reps,
-          loadPercent: waveWeek.loadPercent,
-          weightLbs: calcWeight(lift.trainingMax, waveWeek.loadPercent),
-          restMinutes: waveWeek.restMinutes,
-        }))
+        .map((lift) => buildExercise(lift, waveWeek, bodyWeight))
 
       // Add hinge lift per mode
       if (hingeLift) {
         const addHinge = (sets) =>
           exercises.push({
-            id: hingeLift.id,
-            name: hingeLift.name,
+            ...buildExercise(hingeLift, waveWeek, bodyWeight),
             sets,
-            reps: waveWeek.reps,
-            loadPercent: waveWeek.loadPercent,
-            weightLbs: calcWeight(hingeLift.trainingMax, waveWeek.loadPercent),
-            restMinutes: waveWeek.restMinutes,
             isHinge: true,
           })
 

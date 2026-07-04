@@ -16,8 +16,9 @@ export function useWeekPlan(cycle, weekOffset = 0) {
     const lifts = await db.lifts.where('id').anyOf(cycle.liftIds || []).toArray()
     const liftsWithTM = lifts.map((l) => ({ ...l, trainingMax: calcTrainingMax(l.oneRepMax) }))
     const allRoutines = await db.conditioningRoutines.toArray()
+    const bwEntry = await db.appState.get('bodyWeightLbs')
 
-    return buildWeekPlan(cycle, liftsWithTM, allRoutines, weekOffset)
+    return buildWeekPlan(cycle, liftsWithTM, allRoutines, weekOffset, bwEntry?.value ?? null)
   }, [
     cycle?.id,
     cycle?.startDate,
