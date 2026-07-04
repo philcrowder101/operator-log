@@ -40,9 +40,27 @@ export default function StrengthSessionCard({ sessionLabel, exercises, waveWeek 
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-gray-800 dark:text-white">
-              {ex.weightLbs} lbs
-            </span>
+            {ex.mode === 'reps' ? (
+              <div className="text-right">
+                <div className="text-lg font-bold text-gray-800 dark:text-white">
+                  {ex.reps} reps
+                </div>
+                <div className="text-xs text-gray-400 dark:text-gray-500">bodyweight</div>
+              </div>
+            ) : ex.mode === 'weighted-bw' ? (
+              <div className="text-right">
+                <div className="text-lg font-bold text-gray-800 dark:text-white">
+                  +{ex.addedLbs} lbs
+                </div>
+                <div className="text-xs text-gray-400 dark:text-gray-500">
+                  {ex.totalLbs} total
+                </div>
+              </div>
+            ) : (
+              <span className="text-lg font-bold text-gray-800 dark:text-white">
+                {ex.weightLbs} lbs
+              </span>
+            )}
             <button
               onClick={() => openTimer(ex.restMinutes)}
               className="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-medium"

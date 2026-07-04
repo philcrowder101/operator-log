@@ -14,6 +14,8 @@ const PRESET_LIFTS = [
   'Rows',
 ]
 
+const BODYWEIGHT_PRESETS = ['Weighted Pullups']
+
 export default function LiftClusterEditor({ liftIds, onChange }) {
   const allLifts = useLiveQuery(() => db.lifts.toArray()) || []
   const [adding, setAdding] = useState(false)
@@ -53,7 +55,12 @@ export default function LiftClusterEditor({ liftIds, onChange }) {
       if (!liftIds.includes(existing.id)) onChange([...liftIds, existing.id])
     } else {
       // Create with placeholder 1RM — user updates it in Lifts tab
-      const id = await db.lifts.add({ name, oneRepMax: 135, notes: '' })
+      const id = await db.lifts.add({
+        name,
+        oneRepMax: 135,
+        notes: '',
+        isBodyweight: BODYWEIGHT_PRESETS.includes(name),
+      })
       onChange([...liftIds, id])
     }
   }

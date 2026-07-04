@@ -9,6 +9,7 @@ import LiftClusterEditor from '../components/LiftClusterEditor'
 import HingeLiftEditor from '../components/HingeLiftEditor'
 import ConditioningScheduleEditor from '../components/ConditioningScheduleEditor'
 import CoreWorkScheduleEditor from '../components/CoreWorkScheduleEditor'
+import BodyWeightCard from '../components/BodyWeightCard'
 
 export default function SettingsView() {
   const { cycleId } = useActiveCycle()
@@ -83,6 +84,8 @@ export default function SettingsView() {
         <h1 className="font-bold text-xl text-gray-800 dark:text-white">Settings</h1>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 pb-24">
+
+        <BodyWeightCard />
 
         {allCycles.length === 0 && !creating && (
           <div className="text-center text-gray-400 dark:text-gray-500 text-sm py-8">
