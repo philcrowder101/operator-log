@@ -21,7 +21,6 @@ export default function LiftClusterEditor({ liftIds, onChange }) {
   const [liftRM, setLiftRM] = useState('')
 
   const clusterLifts = allLifts.filter((l) => liftIds.includes(l.id))
-  const existingNames = allLifts.map((l) => l.name.toLowerCase())
 
   // Presets not already in the DB or cluster
   const availablePresets = PRESET_LIFTS.filter(

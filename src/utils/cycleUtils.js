@@ -39,9 +39,6 @@ export function getWeekDays(cycle, weekOffset = 0) {
   const trainingDays = template.defaultDays // e.g. [1,3,5]
   const sessionLabels = template.sessionLabels // e.g. ['A','B','C']
 
-  // Map each training day to a session label in order
-  let sessionCounter = 0
-
   // For Zulu (4x/week A/B alternating), we need to count across weeks
   // Use cycle start date to keep session sequencing consistent
   // Parse as local midnight, not UTC (date-only ISO strings default to UTC).
