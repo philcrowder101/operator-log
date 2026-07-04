@@ -67,8 +67,8 @@ export default function ConditioningDayEditor({ conditioningDays, onChange }) {
 
       {/* Edit modal */}
       {editingDay !== null && editState && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-800 rounded-t-2xl w-full max-w-lg p-6 max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-lg p-6 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-800 dark:text-white">
                 {DAY_NAMES[editingDay]} Conditioning
