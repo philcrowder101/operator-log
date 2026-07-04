@@ -110,22 +110,22 @@ describe('buildWeekPlan — Operator template basics', () => {
 
 describe('buildWeekPlan — exercise weights', () => {
   it('calculates correct sets/reps/weight for Operator wave week 1', () => {
-    // wave week 1: sets:5, reps:5, loadPercent:80, restMinutes:3
-    // squat TM 180: calcWeight(180, 80) = round(144/5)*5 = 145
-    // press TM 90:  calcWeight(90,  80) = round(72/5)*5  = 70
+    // wave week 1: sets:5, reps:5, loadPercent:75, restMinutes:2
+    // squat TM 180: calcWeight(180, 75) = round(135/5)*5 = 135
+    // press TM 90:  calcWeight(90,  75) = round(67.5/5)*5 = 70
     const plan = buildWeekPlan(baseCycle(), [squat, press], [], 0)
     const monday = plan.find((d) => d.dayOfWeek === 1)
     expect(monday.exercises).toHaveLength(2)
-    expect(monday.exercises[0]).toMatchObject({ name: 'Squat', sets: 5, reps: 5, weightLbs: 145 })
+    expect(monday.exercises[0]).toMatchObject({ name: 'Squat', sets: 5, reps: 5, weightLbs: 135 })
     expect(monday.exercises[1]).toMatchObject({ name: 'Press', sets: 5, reps: 5, weightLbs: 70 })
   })
 
   it('uses the correct wave week when weekOffset advances', () => {
-    // weekOffset:1 → wave week index 1 → sets:5, reps:4, loadPercent:85
-    // squat TM 180: calcWeight(180, 85) = round(153/5)*5 = 155
+    // weekOffset:1 → wave week index 1 → sets:4, reps:5, loadPercent:80
+    // squat TM 180: calcWeight(180, 80) = round(144/5)*5 = 145
     const plan = buildWeekPlan(baseCycle(), [squat], [], 1)
     const monday = plan.find((d) => d.dayOfWeek === 1)
-    expect(monday.exercises[0]).toMatchObject({ reps: 4, loadPercent: 85, weightLbs: 155 })
+    expect(monday.exercises[0]).toMatchObject({ sets: 4, reps: 5, loadPercent: 80, weightLbs: 145 })
   })
 })
 
