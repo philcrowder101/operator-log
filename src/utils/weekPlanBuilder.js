@@ -31,6 +31,7 @@ export function buildWeekPlan(cycle, lifts, conditioningRoutines, weekOffset = 0
         waveWeek: null,
         exercises: [],
         conditioning: null,
+        coreWork: null,
       }
     })
   }
@@ -117,6 +118,11 @@ export function buildWeekPlan(cycle, lifts, conditioningRoutines, weekOffset = 0
       ? conditioningRoutines.find((r) => r.id === schedEntry.routineId) || null
       : null
 
+    const coreWork =
+      (cycle.coreWorkSchedule || []).find(
+        (e) => e.weekNumber === waveWeek?.week && e.dayOfWeek === day.dayOfWeek
+      ) || null
+
     return {
       date: day.date,
       dayOfWeek: day.dayOfWeek,
@@ -125,6 +131,7 @@ export function buildWeekPlan(cycle, lifts, conditioningRoutines, weekOffset = 0
       waveWeek,
       exercises,
       conditioning,
+      coreWork,
     }
   })
 }

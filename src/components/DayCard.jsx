@@ -1,15 +1,17 @@
 import StrengthSessionCard from './StrengthSessionCard'
 import ConditioningCard from './ConditioningCard'
+import CoreWorkCard from './CoreWorkCard'
 
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 export default function DayCard({ day }) {
-  const { date, dayLabel, sessionLabel, exercises, conditioning, waveWeek } = day
+  const { date, dayLabel, sessionLabel, exercises, conditioning, coreWork, waveWeek } = day
 
   const isToday = new Date().toDateString() === date.toDateString()
   const hasStrength = sessionLabel !== null && exercises.length > 0
   const hasConditioning = conditioning !== null
-  const isRest = !hasStrength && !hasConditioning
+  const hasCoreWork = coreWork != null
+  const isRest = !hasStrength && !hasConditioning && !hasCoreWork
 
   return (
     <div className={`rounded-xl border p-4 ${
@@ -50,6 +52,12 @@ export default function DayCard({ day }) {
       {hasConditioning && (
         <div className={hasStrength ? 'mt-4 pt-4 border-t border-gray-200 dark:border-gray-700' : ''}>
           <ConditioningCard conditioning={conditioning} />
+        </div>
+      )}
+
+      {hasCoreWork && (
+        <div className={hasStrength || hasConditioning ? 'mt-4 pt-4 border-t border-gray-200 dark:border-gray-700' : ''}>
+          <CoreWorkCard coreWork={coreWork} />
         </div>
       )}
     </div>

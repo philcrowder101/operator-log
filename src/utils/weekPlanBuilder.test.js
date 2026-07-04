@@ -267,3 +267,66 @@ describe('buildWeekPlan — conditioning', () => {
     expect(wednesday.conditioning).toBeNull()
   })
 })
+
+// ─── core work ───────────────────────────────────────────────────────────────
+
+describe('buildWeekPlan — core work', () => {
+  const abTriadEntry = {
+    weekNumber: 1,
+    dayOfWeek: 2, // Tuesday
+    blockId: 'ab-triad',
+    rounds: 3,
+    restMinutes: 2,
+    movements: [
+      { name: 'Plank', mode: 'timed', seconds: 60 },
+      { name: 'Shank', mode: 'timed', seconds: 60 },
+      { name: 'Wheel Rollout', mode: 'reps', reps: 5 },
+    ],
+  }
+
+  it('attaches the matching entry to the right day', () => {
+    const cycle = baseCycle({ coreWorkSchedule: [abTriadEntry] })
+    const plan = buildWeekPlan(cycle, [squat], [], 0)
+    const tuesday = plan.find((d) => d.dayOfWeek === 2)
+    expect(tuesday.coreWork).toEqual(abTriadEntry)
+  })
+
+  it('leaves coreWork null on other days', () => {
+    const cycle = baseCycle({ coreWorkSchedule: [abTriadEntry] })
+    const plan = buildWeekPlan(cycle, [squat], [], 0)
+    plan.filter((d) => d.dayOfWeek !== 2).forEach((d) => {
+      expect(d.coreWork).toBeNull()
+    })
+  })
+
+  it('does not match the same day in a different wave week', () => {
+    const cycle = baseCycle({ coreWorkSchedule: [abTriadEntry] })
+    // weekOffset 1 → wave week 2; entry is for week 1
+    const plan = buildWeekPlan(cycle, [squat], [], 1)
+    const tuesday = plan.find((d) => d.dayOfWeek === 2)
+    expect(tuesday.coreWork).toBeNull()
+  })
+
+  it('is null on every day when the cycle has no coreWorkSchedule', () => {
+    const plan = buildWeekPlan(baseCycle(), [squat], [], 0)
+    plan.forEach((d) => expect(d.coreWork).toBeNull())
+  })
+
+  it('is null on every day for a null cycle (rest week)', () => {
+    const plan = buildWeekPlan(null, [], [], 0)
+    plan.forEach((d) => expect(d.coreWork).toBeNull())
+  })
+
+  it('appears during strengthOff weeks (Base Build)', () => {
+    // bb-fighter-finish week 1 is strengthOff; core work is independent of strength
+    const cycle = baseCycle({
+      templateId: 'bb-fighter-finish',
+      liftIds: [1],
+      coreWorkSchedule: [abTriadEntry],
+    })
+    const plan = buildWeekPlan(cycle, [squat], [], 0)
+    const tuesday = plan.find((d) => d.dayOfWeek === 2)
+    expect(tuesday.coreWork).toEqual(abTriadEntry)
+    expect(tuesday.exercises).toHaveLength(0)
+  })
+})

@@ -8,6 +8,7 @@ import WaveEditor from '../components/WaveEditor'
 import LiftClusterEditor from '../components/LiftClusterEditor'
 import HingeLiftEditor from '../components/HingeLiftEditor'
 import ConditioningScheduleEditor from '../components/ConditioningScheduleEditor'
+import CoreWorkScheduleEditor from '../components/CoreWorkScheduleEditor'
 
 export default function SettingsView() {
   const { cycleId } = useActiveCycle()
@@ -231,6 +232,15 @@ export default function SettingsView() {
                       cycle={cycle}
                       totalWaveWeeks={totalWaveWeeks}
                       onChange={(conditioningSchedule) => updateCycle(cycle.id, { conditioningSchedule })}
+                    />
+                  </SubSection>
+
+                  {/* Core Work Schedule */}
+                  <SubSection title="Core Work Schedule" expanded={expandedSubSection === 'coreWork'} onToggle={() => toggleSub('coreWork')}>
+                    <CoreWorkScheduleEditor
+                      cycle={cycle}
+                      totalWaveWeeks={totalWaveWeeks}
+                      onChange={(coreWorkSchedule) => updateCycle(cycle.id, { coreWorkSchedule })}
                     />
                   </SubSection>
 
