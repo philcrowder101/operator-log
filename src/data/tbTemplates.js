@@ -7,8 +7,8 @@ export const TB_TEMPLATES = [
     sessionLabels: ['A', 'B', 'C'],
     waveWeeks: [
       { week: 1, sets: 5, reps: 5, loadPercent: 75, restMinutes: 2 },
-      { week: 2, sets: 4, reps: 5, loadPercent: 80, restMinutes: 2 },
-      { week: 3, sets: 3, reps: 3, loadPercent: 85, restMinutes: 3 },
+      { week: 2, sets: 5, reps: 4, loadPercent: 80, restMinutes: 2 },
+      { week: 3, sets: 5, reps: 3, loadPercent: 85, restMinutes: 3 },
     ],
     // Operator: all lifts every session
     sessionLiftMap: { A: 'all', B: 'all', C: 'all' },
@@ -37,11 +37,11 @@ export const TB_TEMPLATES = [
     sessionLabels: ['A', 'B', 'C'],
     waveWeeks: [
       { week: 1, sets: 5, reps: 5, loadPercent: 75, restMinutes: 2 },
-      { week: 2, sets: 4, reps: 5, loadPercent: 80, restMinutes: 2 },
-      { week: 3, sets: 3, reps: 3, loadPercent: 85, restMinutes: 3 },
+      { week: 2, sets: 5, reps: 4, loadPercent: 80, restMinutes: 2 },
+      { week: 3, sets: 5, reps: 3, loadPercent: 85, restMinutes: 3 },
       { week: 4, sets: 5, reps: 5, loadPercent: 75, restMinutes: 2 },
-      { week: 5, sets: 4, reps: 5, loadPercent: 80, restMinutes: 2 },
-      { week: 6, sets: 3, reps: 3, loadPercent: 85, restMinutes: 3 },
+      { week: 5, sets: 5, reps: 4, loadPercent: 80, restMinutes: 2 },
+      { week: 6, sets: 5, reps: 3, loadPercent: 85, restMinutes: 3 },
     ],
     sessionLiftMap: { A: 'all', B: 'all', C: 'all' },
     defaultDays: [1, 3, 5], // Mon, Wed, Fri
@@ -135,5 +135,20 @@ export const TB_TEMPLATES = [
     ],
     sessionLiftMap: { A: 'all', B: 'all' },
     defaultDays: [1, 4], // Mon, Thu
+  },
+  {
+    id: 'blank-4wk',
+    name: 'Blank (4-Week)',
+    isCustom: false,
+    sessionsPerWeek: 7,
+    sessionLabels: ['A', 'B', 'C'],
+    waveWeeks: [
+      { week: 1, sets: 3, reps: 5, loadPercent: 75, restMinutes: 2 },
+      { week: 2, sets: 3, reps: 5, loadPercent: 75, restMinutes: 2 },
+      { week: 3, sets: 3, reps: 5, loadPercent: 75, restMinutes: 2 },
+      { week: 4, sets: 3, reps: 5, loadPercent: 75, restMinutes: 2 },
+    ],
+    sessionLiftMap: { A: 'all', B: 'all', C: 'all' },
+    defaultDays: [1, 3, 5], // Mon, Wed, Fri
   },
 ]
